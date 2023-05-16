@@ -1,0 +1,9 @@
+# 编译的目标平台
+[build]
+# target = ".cargo/riscv64imac-unknown-none-elf.json"
+target = "aarch64-unknown-none-softfloat"
+
+[target.aarch64-unknown-none-softfloat]
+rustflags = [
+    "-Clink-arg=-T.cargo/linker-qemu.ld",
+]

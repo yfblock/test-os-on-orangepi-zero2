@@ -1,0 +1,12 @@
+[package]
+name = "test-os-on-orangepi-zero2"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ns16550a = "0.2.0"
+log = "0.4"
+buddy_system_allocator = "0.8"
+spin = { version = "0.9.2", features = ["mutex"] }
