@@ -1,4 +1,4 @@
-# 测试在 Orangepi Zero 上写 OS
+# 测试在 Orangepi Zero2 上写 OS
 
 ## 工具需求
 
