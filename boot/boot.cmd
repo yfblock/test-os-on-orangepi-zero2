@@ -77,11 +77,13 @@ if test "${ethernet_phy}" = "yt8531c"; then
         fdt set /soc/ethernet@5020000 allwinner,tx-delay-ps <600>
 fi
 
-load ${devtype} ${devnum} ${kernel_addr_r} ${prefix}kernel.bin
+# load ${devtype} ${devnum} ${kernel_addr_r} ${prefix}kernel.bin
 echo "Booting from ${kernel_addr_r}"
 # booti ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}
 # booti ${kernel_addr_r}
 go ${kernel_addr_r}
+
+exit
 
 # Recompile with:
 # mkimage -C none -A arm -T script -d /boot/boot.cmd /boot/boot.scr

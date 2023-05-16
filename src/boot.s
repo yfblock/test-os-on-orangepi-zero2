@@ -51,7 +51,7 @@ _start:
 	ADR_REL	x0, __boot_core_stack_end_exclusive
 	mov	sp, x0
 	// Jump to Rust code.
-	bl	_start_rust
+	b	_start_rust
 	# bl .L_test
 	ret
 

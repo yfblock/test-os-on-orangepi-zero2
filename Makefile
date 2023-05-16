@@ -38,6 +38,11 @@ sdcard: build
 	cp kernel.bin mount
 	sudo umount /dev/mmcblk0p1
 
+flash: build
+	sudo sunxi-fel spl u-boot-sunxi-with-spl.bin
+	sudo sunxi-fel write 0x40080000 kernel.bin
+	sudo sunxi-fel uboot u-boot-sunxi-with-spl.bin
+
 miniterm:
 	@sudo chmod 777 /dev/ttyUSB0
 	python -m serial.tools.miniterm --eol LF --dtr 0 --rts 0 --filter direct /dev/ttyUSB0 115200
