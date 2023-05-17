@@ -25,3 +25,7 @@ make sdcard
 ```
 make flash
 ```
+
+### 更新一下进度
+
+2023-5-17: 手上这块orangepi zero2  好像坏了，等待下单再卖一块

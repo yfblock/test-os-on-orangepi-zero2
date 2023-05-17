@@ -42,6 +42,7 @@ flash: build
 	sudo sunxi-fel spl u-boot-sunxi-with-spl.bin
 	sudo sunxi-fel write 0x40080000 kernel.bin
 	sudo sunxi-fel uboot u-boot-sunxi-with-spl.bin
+	make miniterm
 
 miniterm:
 	@sudo chmod 777 /dev/ttyUSB0
