@@ -8,12 +8,17 @@ QEMU_EXEC := qemu-system-aarch64 \
 		-m 1G \
 		-nographic \
 		-smp 4
+BOARD	:= qemu
+FEATURES:= $(BOARD)
 MKIMAGE := ~/Downloads/u-boot-orangepi/tools/mkimage
+LINKER  := .cargo/linker-${BOARD}.ld
 LOG := info
+
 all: build
 
 build:
-	@LOG=$(LOG) cargo build --release
+	cp ${LINKER} .cargo/linker.ld
+	LOG=$(LOG) cargo build --release --features "${FEATURES}"
 	rust-objcopy --strip-all -O binary $(KERNEL_ELF) $(KERNEL_BIN)
 
 qemu: build
@@ -32,17 +37,17 @@ gdb:
         -ex 'target remote localhost:1234'
 
 sdcard: build
-	sudo mount /dev/mmcblk0p1 mount -o uid=1000,gid=1000
+	sudo mount /dev/sdb1 mount -o uid=1000,gid=1000
 	$(MKIMAGE) -C none -A arm -T script -d boot/boot.cmd mount/boot.scr
 	cp boot/orangepiEnv.txt mount
 	cp kernel.bin mount
-	sudo umount /dev/mmcblk0p1
+	sudo umount /dev/sdb1
 
 flash: build
 	sudo sunxi-fel spl u-boot-sunxi-with-spl.bin
 	sudo sunxi-fel write 0x40080000 kernel.bin
 	sudo sunxi-fel uboot u-boot-sunxi-with-spl.bin
-	make miniterm
+	# make miniterm
 
 miniterm:
 	@sudo chmod 777 /dev/ttyUSB0

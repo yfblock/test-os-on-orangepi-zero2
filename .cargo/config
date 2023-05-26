@@ -5,5 +5,5 @@ target = "aarch64-unknown-none-softfloat"
 
 [target.aarch64-unknown-none-softfloat]
 rustflags = [
-    "-Clink-arg=-T.cargo/linker-qemu.ld",
+    "-Clink-arg=-T.cargo/linker.ld",
 ]

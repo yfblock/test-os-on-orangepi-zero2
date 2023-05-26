@@ -1,12 +1,10 @@
-#![no_std]
-
-use core::fmt::{self, Write};
+use core::fmt::{self, Write, Arguments};
 
 use log::{self, info, Level, LevelFilter, Log, Metadata, Record};
 
 use crate::uart::UART;
 
-struct Logger;
+pub struct Logger;
 
 impl Log for Logger {
     fn enabled(&self, _metadata: &Metadata) -> bool {
@@ -27,7 +25,7 @@ impl Log for Logger {
 
 impl Write for Logger {
     fn write_str(&mut self, s: &str) -> fmt::Result {
-        UART.lock().write_str(s);
+        let _ = UART.lock().write_str(s);
         Ok(())
     }
 }
@@ -48,32 +46,31 @@ pub fn init() {
 #[macro_export]
 macro_rules! print {
     ($($arg:tt)*) => ({
-        $crate::print(format_args!($($arg)*));
+        // $crate::logging::Logger.write_fmt(format_args!($($arg)*));
+        $crate::logging::print_args(format_args!($($arg)*))
     });
 }
 
 #[macro_export]
 macro_rules! println {
-    ($fmt:expr) => (print!(concat!($fmt, "\n")));
-    ($fmt:expr, $($arg:tt)*) => (print!(concat!($fmt, "\n"), $($arg)*));
+    ($fmt:expr) => (print!(concat!($fmt, "\r\n")));
+    ($fmt:expr, $($arg:tt)*) => (print!(concat!($fmt, "\r\n"), $($arg)*));
 }
 
 macro_rules! with_color {
     ($args: ident, $color_code: ident) => {{
-        format_args!("\u{1B}[{}m{}\u{1B}[0m\n\r", $color_code as u8, $args)
+        format_args!("\u{1B}[{}m{}\u{1B}[0m\r\n", $color_code as u8, $args)
     }};
+}
+
+pub fn print_args(args: fmt::Arguments) {
+    Logger.write_fmt(args).expect("cant' write arguments")
 }
 
 fn print_in_color(args: fmt::Arguments, color_code: u8) {
     Logger
         .write_fmt(with_color!(args, color_code))
         .expect("can't write color string in logging module.");
-}
-
-pub fn print(args: fmt::Arguments) {
-    Logger
-        .write_fmt(args)
-        .expect("can't write string in logging module.");
 }
 
 fn level_to_color_code(level: Level) -> u8 {
