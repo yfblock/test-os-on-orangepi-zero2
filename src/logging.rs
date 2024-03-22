@@ -2,7 +2,7 @@ use core::fmt::{self, Write, Arguments};
 
 use log::{self, info, Level, LevelFilter, Log, Metadata, Record};
 
-use crate::uart::UART;
+use crate::uart::UART1;
 
 pub struct Logger;
 
@@ -25,7 +25,9 @@ impl Log for Logger {
 
 impl Write for Logger {
     fn write_str(&mut self, s: &str) -> fmt::Result {
-        let _ = UART.lock().write_str(s);
+        // let _ = UART1.lock().write_str(s);
+        // UART1.lock().putchar()
+        s.as_bytes().iter().for_each(|c| UART1.lock().putchar(*c));
         Ok(())
     }
 }

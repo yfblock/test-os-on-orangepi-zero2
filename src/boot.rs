@@ -1,4 +1,6 @@
 use core::arch::asm;
+use alloc::string::String;
+use fdt::Fdt;
 use tock_registers::interfaces::Writeable;
 
 
@@ -15,12 +17,12 @@ pub static mut STACK: [u8; STACK_SIZE] = [0u8; STACK_SIZE];
 #[no_mangle]
 unsafe fn _prepare_el2_to_el1_transition(phys_boot_core_stack_end_exclusive_addr: u64) {
     println!("stack: {:#X}", STACK.as_ptr() as usize);
-    let tmp: usize;
-    asm!(
-        "mrs {tmp}, CurrentEL",
-        tmp = out(reg) tmp
-    );
-    println!("currentel: {}", tmp >> 2);
+    // let tmp: usize;
+    // asm!(
+    //     "mrs {tmp}, CurrentEL",
+    //     tmp = out(reg) tmp
+    // );
+    // println!("currentel: {}", tmp >> 2);
     // // Enable timer counter registers for EL1.
     // CNTHCTL_EL2.write(CNTHCTL_EL2::EL1PCEN::SET + CNTHCTL_EL2::EL1PCTEN::SET);
 
@@ -29,7 +31,7 @@ unsafe fn _prepare_el2_to_el1_transition(phys_boot_core_stack_end_exclusive_addr
 
     // Set EL1 execution state to AArch64.
     HCR_EL2.write(HCR_EL2::RW::EL1IsAarch64);
-    println!("Hello, world!");
+    // println!("Hello, world!");
 
     // Set up a simulated exception return.
     //
@@ -49,8 +51,8 @@ unsafe fn _prepare_el2_to_el1_transition(phys_boot_core_stack_end_exclusive_addr
     // Set up SP_EL1 (stack pointer), which will be used by EL1 once we "return" to it. Since there
     // are no plans to ever return to EL2, just re-use the same stack.
     SP_EL1.set(phys_boot_core_stack_end_exclusive_addr);
-    println!("sp: {:#x}", phys_boot_core_stack_end_exclusive_addr);
-    println!("addr: {:#x}", _start_rust as *const () as u64);
+    // println!("sp: {:#x}", phys_boot_core_stack_end_exclusive_addr);
+    // println!("addr: {:#x}", _start_rust as *const () as u64);
     asm::eret();
 }
 
@@ -82,7 +84,7 @@ unsafe extern "C" fn _start() -> ! {
         // 3. 进入 os 内核
         "   
             bl	_prepare_el2_to_el1_transition
-            # bl _start_rust
+            bl _start_rust
             ret
         ",
         stack_size = const STACK_SIZE,
@@ -107,6 +109,7 @@ fn clear_bss() {
 pub unsafe fn _start_rust(device_tree: usize) {
     println!("_start_rust");
     clear_bss();
+
     crate::main(device_tree);
 }
 

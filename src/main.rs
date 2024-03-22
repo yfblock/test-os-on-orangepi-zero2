@@ -3,15 +3,19 @@
 #![feature(panic_info_message)]
 #![feature(asm_const)]
 #![feature(naked_functions)]
+#![feature(iter_intersperse)]
 
 use core::arch::asm;
 use core::fmt::Write;
 
 use aarch64_cpu::registers::CurrentEL;
+use alloc::string::String;
 use tock_registers::interfaces::Readable; // <-- Trait needed to use `write()` and `set()`.
 use fdt::Fdt;
 
-use crate::uart::UART;
+use crate::uart::UART1;
+
+extern crate alloc;
 
 #[macro_use]
 extern crate log;
@@ -38,11 +42,12 @@ extern "C" fn trap_handler(tf: &mut TrapFrame) {
 
 #[no_mangle]
 extern "C" fn main(device_tree: usize) {
-    // kalloc::init();
-    uart::init();
+    kalloc::init();
+    // uart::uart_init();
     unsafe {
         trapframe::init();
     }
+    
     // logging::init();
     // loop {
     //     // info!("debug 000");
@@ -76,7 +81,6 @@ extern "C" fn main(device_tree: usize) {
 
     // info!("version: {:#x}", ar);
     println!("device_tree: {:#x}", device_tree);
-    panic!("end");
 
     // println!("debug currentEL: {:?}", CurrentEL.read(CurrentEL::EL));
 
@@ -84,13 +88,33 @@ extern "C" fn main(device_tree: usize) {
 
     println!("debug 0");
 
-    let fdt_ptr = include_bytes!("../boot/dtb/allwinner/sun50i-h616-orangepi-zero2.dtb");
-    println!("debug 0");
-    // let fdt = unsafe {
-    //     Fdt::from_ptr(fdt_ptr.as_ptr()).unwrap()
-    // };
-    println!("debug 1");
+    // let fdt_ptr = include_bytes!("../boot/dtb/allwinner/sun50i-h616-orangepi-zero2.dtb");
+    // println!("debug 0");
+    // // let fdt = unsafe {
+    // //     Fdt::from_ptr(fdt_ptr.as_ptr()).unwrap()
+    // // };
+    // println!("debug 1");
     
+    let fdt = unsafe { Fdt::from_ptr(0x7bf3db20 as *const u8).unwrap() };
+
+    println!("There has {} CPU(s)", fdt.cpus().count());
+
+    // fdt.memory()
+    //     .regions()
+    //     .for_each(|x: fdt::standard_nodes::MemoryRegion| {
+    //         // info!(
+    //         //     "memory region {:#X} - {:#X}",
+    //         //     x.starting_address as usize,
+    //         //     x.starting_address as usize + x.size.unwrap()
+    //         // );
+    //     });
+
+    for i in fdt.all_nodes() {
+        if let Some(compatible) =  i.compatible() {
+            println!("node : {:?}", compatible.all().intersperse(" ").collect::<String>());
+        }
+    }
+
     // let fdt =
         // unsafe { Fdt::from_ptr(0x000000007bf3db20 as *const u8).unwrap() };
         // unsafe { Fdt::from_ptr(0x4FA00000 as *const u8).unwrap() };
@@ -114,4 +138,5 @@ extern "C" fn main(device_tree: usize) {
     //         println!("    {}", child.name);
     //     }
     // }
+    panic!("end");
 }

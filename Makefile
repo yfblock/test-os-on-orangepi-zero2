@@ -8,7 +8,7 @@ QEMU_EXEC := qemu-system-aarch64 \
 		-m 1G \
 		-nographic \
 		-smp 4
-BOARD	:= qemu
+BOARD	:= h616
 FEATURES:= $(BOARD)
 MKIMAGE := ~/Downloads/u-boot-orangepi/tools/mkimage
 LINKER  := .cargo/linker-${BOARD}.ld

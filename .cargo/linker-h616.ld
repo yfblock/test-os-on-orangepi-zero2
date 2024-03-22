@@ -46,4 +46,8 @@ SECTIONS
     }
 
     PROVIDE(end = .);
+
+    /DISCARD/ : {
+        *(.comment) *(.gnu*) *(.note*) *(.eh_frame*)
+    }
 }
